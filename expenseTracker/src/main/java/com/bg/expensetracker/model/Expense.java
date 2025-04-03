@@ -1,5 +1,6 @@
 package com.bg.expensetracker.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -20,8 +21,11 @@ public class Expense {
     private Long id;
     private Instant expensedate;
     private String description;
+    private String location;
     @ManyToOne
     private Category category;
+
+    @JsonIgnore
     @ManyToOne
     private User user;
 
