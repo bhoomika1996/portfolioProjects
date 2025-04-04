@@ -27,16 +27,16 @@ function App() {
       const response = await axios.get("/sudoku/generate");
       console.log("Fetched Sudoku:", response.data); // Debugging
       if (response.data && response.data.length === 9) {
-        setSudokuArr(response.data);
-        setInitial(response.data);
+        const newSudoku = getDeepCopy(response.data); // 🔁 Clone to avoid shared references
+        setSudokuArr(newSudoku);
+        setInitial(getDeepCopy(newSudoku)); // Separate copy for original puzzle
       } else {
         console.error("Invalid Sudoku Data:", response.data);
       }
     } catch (error) {
       console.error("Error fetching Sudoku:", error);
     }
-}
-
+  }
 
   function newSudoku(){
     fetchSudoku();
@@ -123,6 +123,7 @@ function App() {
 
     if(grid[row][col] !== -1){
       let isLast = row>=8 && col>=8;
+      if (isLast) return true;
       if(!isLast){
         let [newRow, newCol] = getNext(row, col);
         return solver(grid, newRow, newCol);
