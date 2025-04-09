@@ -134,7 +134,8 @@ This project is a full-stack web application built to generate Sudoku puzzles, a
 ---
 
 ## 📸 Screenshots / Demo
-*(Add screenshots here if hosting the project or using locally)*
+
+![Screenshot 2025-04-09 at 2 51 48 PM](https://github.com/user-attachments/assets/c7a19f74-d8d9-400c-9a58-5f2ac13b5e05)
 
 ---
 
