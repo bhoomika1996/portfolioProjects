@@ -1,7 +1,9 @@
 import logo from './logo.svg';
 import './App.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import Confetti from 'react-confetti';
+import { useWindowSize } from '@react-hook/window-size';
 
 // let initial=[
 //   [-1, 5, -1, 9, -1, -1, -1, -1, -1],
@@ -17,6 +19,14 @@ import axios from 'axios';
 function App() {
   const [sudokuArr, setSudokuArr] = useState([]);
   const [initial,setInitial] = useState([]);
+  const [difficulty, setDifficulty] = useState("easy");
+  const [startTime, setStartTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  //const [timerInterval, setTimerInterval] = useState(null);
+  const timerRef = useRef(null);
+  const [isSolved, setIsSolved] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [width, height] = useWindowSize();
 
   useEffect(() => {
     fetchSudoku();
@@ -24,23 +34,48 @@ function App() {
 
   async function fetchSudoku() {
     try {
-      const response = await axios.get("/sudoku/generate");
-      console.log("Fetched Sudoku:", response.data); // Debugging
+      const response = await axios.get("/api/sudoku/generate", {
+        params: { difficulty }
+      });
+      console.log("Fetched Sudoku:", response.data);
       if (response.data && response.data.length === 9) {
-        const newSudoku = getDeepCopy(response.data); // 🔁 Clone to avoid shared references
+        const newSudoku = getDeepCopy(response.data);
         setSudokuArr(newSudoku);
-        setInitial(getDeepCopy(newSudoku)); // Separate copy for original puzzle
+        setInitial(getDeepCopy(newSudoku));
+
+        stopTimer();     // 🛑 Stop any previous timer
+        setElapsedTime(0);
+        startTimer();    // ▶️ Start fresh timer
       } else {
         console.error("Invalid Sudoku Data:", response.data);
       }
     } catch (error) {
       console.error("Error fetching Sudoku:", error);
     }
-  }
+  } 
 
-  function newSudoku(){
+  function startTimer() {
+    stopTimer(); // Ensure no duplicate intervals
+    const start = Date.now();
+    setStartTime(start);
+    timerRef.current = setInterval(() => {
+      setElapsedTime(Math.floor((Date.now() - start) / 1000));
+    }, 1000);
+  }
+  
+  function stopTimer() {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }  
+
+ function newSudoku(){
+    setIsSolved(false); // Enable all buttons
+    setShowConfetti(false); // 🎈 Hide confetti
     fetchSudoku();
   }
+  
   
   function getDeepCopy(arr){
     return JSON.parse(JSON.stringify(arr));
@@ -80,13 +115,24 @@ function App() {
     console.log(sudoku);
 
     if(compare.isComplete){
-      alert("Congratulation!!! You have solved Sudoku!");
+      stopTimer();
+      setShowConfetti(true); // 🎉 Show animation
+      alert(`🎉 Congratulations! You solved it in ${formatTime(elapsedTime)}.`);
+      setIsSolved(true); // disable other buttons
+
     } else if(compare.isSolvable){
       alert("Keep Going!");
     }else{
       alert("Sudoku can't be solved, try again!")
     }
   }
+  
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  
 
   function checkBox(grid, row, col, num){
     let boxArr = [],
@@ -147,24 +193,49 @@ function App() {
     return false;
   }
 
-  function solveSudoku(){
+  function solveSudoku() {
     let sudoku = getDeepCopy(initial);
     solver(sudoku);
     setSudokuArr(sudoku);
     console.log(sudokuArr);
+    stopTimer();
+    setIsSolved(true); // Disable buttons except New Sudoku
   }
-
+  
   function resetSudoku(){
     let sudoku = getDeepCopy(initial);
     setSudokuArr(sudoku);
     console.log(sudokuArr);
 
   }
-
+  useEffect(() => {
+    return () => {
+      stopTimer();
+    };
+  }, []);
+  
   return (
     <div className="App">
       <div className="App-header">
-        <h3> Sudoku Solver </h3>
+
+      {showConfetti && <Confetti width={width} height={height} />}
+
+        <h3> 🧩 Sudoku Solver </h3>
+        <p className="time-elapsed">🕒 Time Elapsed: <strong>{formatTime(elapsedTime)}</strong></p>
+
+        {/* Difficulty Selector */}
+        <div className='difficulty-select'>
+          <label style={{ marginRight: "10px" }}>Select Difficulty:</label>
+          <select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value)}
+          >
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+
         <table>
           <tbody>
             {
@@ -182,32 +253,19 @@ function App() {
                 ))}
               </tr>
             ))}
-            {/* {
-              [0,1,2,3,4,5,6,7,8].map((row,rIndex) => {
-                return <tr key={rIndex} className={((row+1) %3 ===0) ? 'bBorder':''}>
-                  {[0,1,2,3,4,5,6,7,8].map((col,cIndex) => {
-                    return <td key={rIndex+cIndex} className={((col+1) %3 ===0) ? 'rBorder':''}>
-                      <input onChange={(e) => onInputChange(e,row, col)} 
-                      value={sudokuArr[row][col]=== -1?'': sudokuArr[row][col]} 
-                      className='cellInput'
-                      disabled={initial[row][col]!==-1}></input>
-                    </td>
-                  })}
-                </tr>
-              })
-            } */}
             
           </tbody>
         </table>
         <div className='buttonContainer'>
-          <button className='checkButton' onClick={checkSudoku}>Check</button>
-          <button className='solveButton' onClick={solveSudoku}>Solve</button>
-          <button className='resetButton' onClick={resetSudoku}>Reset</button>
+          <button className='checkButton' onClick={checkSudoku} disabled={isSolved}>Check</button>
+          <button className='solveButton' onClick={solveSudoku} disabled={isSolved}>Solve</button>
+          <button className='resetButton' onClick={resetSudoku} disabled={isSolved}>Reset</button>
           <button className='newButton' onClick={newSudoku}>New Sudoku</button>
         </div>
       </div>
     </div>
   );
+  
 }
 
 export default App;
