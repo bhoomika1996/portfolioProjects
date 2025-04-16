@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -23,9 +22,6 @@ public class CodeReviewService {
     private WrapperService wrapperService;
     @Autowired
     private CodeSnippetRepository repository;
-
-    @Autowired
-    private ListCodeSnippet listCodeSnippet;
 
     public CodeReviewService(InferenceClient inferenceClient) {
         this.inferenceClient = inferenceClient;
@@ -51,11 +47,12 @@ public class CodeReviewService {
         snippet.setUserId("demoUser"); // Placeholder for real auth
         snippet.setCreatedAt(LocalDateTime.now());
         repository.save(snippet);
+        /*
         log.debug("codeSnippet: "+snippet);
         List<CodeSnippet> codeSnippets = listCodeSnippet.findByUserId("demoUser");
         for(CodeSnippet codeSnippet : codeSnippets) {
             log.debug(String.valueOf(codeSnippet));
-        }
+        }*/
         return codeReviewResponse;
     }
 }

@@ -15,4 +15,8 @@ public class ListCodeSnippet {
     public List<CodeSnippet> findByUserId(String userId) {
         return codeSnippetRepository.findByUserId(userId);
     }
+
+    public List<CodeSnippet> findAllSnippets() {
+        return codeSnippetRepository.findAll();
+    }
 }
