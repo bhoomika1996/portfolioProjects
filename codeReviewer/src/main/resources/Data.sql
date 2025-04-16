@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS codeSnippetRecords (
                                      id BIGINT PRIMARY KEY,
-                                     language VARCHAR(255),
+                                     lang VARCHAR(255),
                                      code VARCHAR(255),
     issues VARCHAR(255),
     suggestions VARCHAR(255),

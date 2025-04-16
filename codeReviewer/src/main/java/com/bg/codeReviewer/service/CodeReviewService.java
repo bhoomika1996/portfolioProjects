@@ -11,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Slf4j
 @Service
 public class CodeReviewService {
@@ -20,6 +23,9 @@ public class CodeReviewService {
     private WrapperService wrapperService;
     @Autowired
     private CodeSnippetRepository repository;
+
+    @Autowired
+    private ListCodeSnippet listCodeSnippet;
 
     public CodeReviewService(InferenceClient inferenceClient) {
         this.inferenceClient = inferenceClient;
@@ -38,13 +44,18 @@ public class CodeReviewService {
 
         CodeSnippet snippet = new CodeSnippet();
         snippet.setCode(request.getCode());
-        snippet.setLanguage(request.getLanguage());
+        snippet.setLang(request.getLanguage());
         snippet.setIssues(String.join("\n", codeReviewResponse.getIssues()));
         snippet.setSuggestions(String.join("\n", codeReviewResponse.getSuggestions()));
         snippet.setDifficulty(codeReviewResponse.getDifficulty());
         snippet.setUserId("demoUser"); // Placeholder for real auth
+        snippet.setCreatedAt(LocalDateTime.now());
         repository.save(snippet);
-
+        log.debug("codeSnippet: "+snippet);
+        List<CodeSnippet> codeSnippets = listCodeSnippet.findByUserId("demoUser");
+        for(CodeSnippet codeSnippet : codeSnippets) {
+            log.debug(String.valueOf(codeSnippet));
+        }
         return codeReviewResponse;
     }
 }

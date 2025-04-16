@@ -13,7 +13,7 @@ public class CodeSnippet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String language;
+    private String lang;
 
     @Column(columnDefinition = "TEXT")
     private String code;
