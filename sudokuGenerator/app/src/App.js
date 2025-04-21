@@ -27,6 +27,8 @@ function App() {
   const [isSolved, setIsSolved] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [width, height] = useWindowSize();
+  const [invalidCell, setInvalidCell] = useState(null);
+
 
   useEffect(() => {
     fetchSudoku();
@@ -82,12 +84,31 @@ function App() {
   }
 
   function onInputChange(e, row, col){
-    var val = parseInt(e.target.value) || -1, grid = getDeepCopy(sudokuArr);
-    if(val===-1 || val>=1 && val<=9){
-      grid[row][col] = val;
+    const val = parseInt(e.target.value) || -1;
+    const newGrid = getDeepCopy(sudokuArr);
+  
+    if(val === -1 || (val >= 1 && val <= 9)){
+      newGrid[row][col] = val;
+      setSudokuArr(newGrid);
+  
+      // Run checkSudoku logic inline
+      const sudokuCopy = getDeepCopy(initial);
+      solver(sudokuCopy);
+      const compare = compareSudokus(newGrid, sudokuCopy);
+      if(compare.isComplete){
+        stopTimer();
+        setShowConfetti(true); // 🎉 Show animation
+        alert(`🎉 Congratulations! You solved it in ${formatTime(elapsedTime)}.`);
+        setIsSolved(true); // disable other buttons
+      }
+      else if(compare.isSolvable){
+        setInvalidCell(null);
+      } else {
+        setInvalidCell({ row, col });
+      }
     }
-    setSudokuArr(grid);
   }
+  
 
   function compareSudokus(currSudoku, solvedSudoku){
     let res = {
@@ -246,9 +267,10 @@ function App() {
                     <input
                       onChange={(e) => onInputChange(e, rIndex, cIndex)}
                       value={sudokuArr[rIndex][cIndex] === -1 ? '' : sudokuArr[rIndex][cIndex]}
-                      className='cellInput'
+                      className={`cellInput ${invalidCell?.row === rIndex && invalidCell?.col === cIndex ? 'invalidCell' : ''}`}
                       disabled={initial.length > 0 && initial[rIndex][cIndex] !== -1}
                     />
+
                   </td>
                 ))}
               </tr>

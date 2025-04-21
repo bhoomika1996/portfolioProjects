@@ -134,3 +134,8 @@ td {
 .time-elapsed:hover {
   background: #20232a;
 }
+
+.invalidCell {
+  background-color: #ffcccc !important; /* Light red */
+  border: 2px solid red;
+}
