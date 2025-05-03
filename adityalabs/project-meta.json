@@ -1,0 +1,11 @@
+[
+    {
+      "name": "Medical Camp Registration App",
+      "image": "https://raw.githubusercontent.com/bhoomika1996/portfolioProjects/main/YogaPoseRecommender/preview.png",
+      "featured": false,
+      "category": "Backend",
+      "techStack": "Java, Spring boot, MySQL",
+      "description": "A Java Spring Boot backend with MySQL for user registration, login, and managing medical records for users and their family members."
+    }
+  ]
+  

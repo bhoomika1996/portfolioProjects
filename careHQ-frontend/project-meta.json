@@ -1,0 +1,10 @@
+[
+    {
+      "name": "Medical Camp App",
+      "image": "https://raw.githubusercontent.com/bhoomika1996/portfolioProjects/main/YogaPoseRecommender/preview.png",
+      "featured": false,
+      "category": "Frontend",
+      "techStack": "React Native",
+      "description": "A React Native mobile app that allows users to register, log in, and manage medical records for themselves and their family members"
+    }
+  ]

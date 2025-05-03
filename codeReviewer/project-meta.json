@@ -3,7 +3,9 @@
       "name": "Code Reviewer",
       "image": "https://raw.githubusercontent.com/bhoomika1996/portfolioProjects/main/codeReviewer/preview.png",
       "featured": true,
-      "category": "Fullstack AI"
+      "category": "Fullstack AI",
+      "techStack": "Java, Python, React, H2, Ollama, Spring boot",
+      "description": "Application that allows developers to submit code snippets and receive automated feedback powered by AI. The system provides code quality suggestions, identifies issues, estimates complexity, and stores review history in a database"
     }
   ]
   

@@ -1,9 +1,11 @@
 [
     {
       "name": "Yoga Pose Recommender app",
-      "image": "https://raw.githubusercontent.com/bhoomika1996/portfolioProjects/main/yogaPoseRecommender/preview.png",
+      "image": "https://raw.githubusercontent.com/bhoomika1996/portfolioProjects/main/YogaPoseRecommender/preview.png",
       "featured": true,
-      "category": "Fullstack"
+      "category": "Fullstack",
+      "techStack": "JavaScript, Node.js Framework, Firestore, Google Cloud Run, Gemini in Vertex AI, Langchain JS framework",
+      "description": "A smart yoga assistant built with Node.js that helps you explore yoga poses using vector search. Powered by Hugging Face data, Gemini-generated insights, and Firestore with semantic indexing for fast and intuitive recommendations."
     }
   ]
   

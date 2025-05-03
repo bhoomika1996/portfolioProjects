@@ -3,7 +3,9 @@
       "name": "Code Reviewer",
       "image": "https://raw.githubusercontent.com/bhoomika1996/portfolioProjects/main/sudokuGenerator/preview.png",
       "featured": true,
-      "category": "Fullstack"
+      "category": "Fullstack",
+      "description":"A web app that generates Sudoku puzzles, lets users solve them interactively, and offers instant validation and auto-solve options.",
+      "techStack": "Java, Spring boot, ReactJS"
     }
   ]
   
