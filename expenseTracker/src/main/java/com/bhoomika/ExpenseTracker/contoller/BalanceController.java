@@ -25,7 +25,7 @@ public class BalanceController {
      */
     @GetMapping("/group/{groupId}")
     public ResponseEntity<List<BalanceResponse>> getBalancesByGroup(@PathVariable Long groupId) {
-        List<BalanceResponse> balances = balanceService.calculateBalances(groupId);
+        List<BalanceResponse> balances = balanceService.getBalancesForGroup(groupId);
         return ResponseEntity.ok(balances);
     }
 

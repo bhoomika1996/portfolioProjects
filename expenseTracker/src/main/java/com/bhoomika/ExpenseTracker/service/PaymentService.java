@@ -9,6 +9,7 @@ import com.bhoomika.ExpenseTracker.model.*;
 import com.bhoomika.ExpenseTracker.repository.PaymentRepository;
 import com.bhoomika.ExpenseTracker.repository.UserRepository;
 import com.bhoomika.ExpenseTracker.repository.GroupRepository;
+import com.bhoomika.ExpenseTracker.repository.BalanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,9 @@ public class PaymentService {
     @Autowired
     private GroupRepository groupRepository;
 
+    @Autowired
+    private BalanceRepository balanceRepository;
+
     public PaymentResponse recordPayment(PaymentRequest request) {
         User fromUser = userRepository.findById(request.getFromUserId())
                 .orElseThrow(() -> new RuntimeException("From user not found"));
@@ -44,6 +48,52 @@ public class PaymentService {
         payment.setTimestamp(LocalDateTime.now());
 
         Payment savedPayment = paymentRepository.save(payment);
+
+        // Now update balances to reflect the payment (reduce debt)
+
+        // Get balance: fromUser owes toUser
+        Balance fromToBalance = balanceRepository.findByGroupAndUsers(group.getGroupId(),
+                fromUser.getUserId(), toUser.getUserId());
+
+        if (fromToBalance == null) {
+            fromToBalance = new Balance();
+            fromToBalance.setGroup(group);
+            fromToBalance.setFromUser(fromUser);
+            fromToBalance.setToUser(toUser);
+            fromToBalance.setAmount(0.0);
+        }
+
+        // Get reverse balance: toUser owes fromUser
+        Balance toFromBalance = balanceRepository.findByGroupAndUsers(group.getGroupId(),
+                toUser.getUserId(), fromUser.getUserId());
+
+        if (toFromBalance == null) {
+            toFromBalance = new Balance();
+            toFromBalance.setGroup(group);
+            toFromBalance.setFromUser(toUser);
+            toFromBalance.setToUser(fromUser);
+            toFromBalance.setAmount(0.0);
+        }
+
+        // Adjust balances according to payment amount
+        double paymentAmount = request.getAmount();
+        double newFromToAmt = fromToBalance.getAmount() - paymentAmount;
+
+        if (newFromToAmt < 0) {
+            // Now 'fromUser' owes 'toUser' net positive balance
+            toFromBalance.setAmount(Math.abs(newFromToAmt));
+            balanceRepository.save(toFromBalance);
+
+            fromToBalance.setAmount(0.0);
+            balanceRepository.save(fromToBalance);
+        } else {
+            // 'toUser' owes 'fromUser' reduced amount or zero
+            fromToBalance.setAmount(newFromToAmt);
+            balanceRepository.save(fromToBalance);
+
+            toFromBalance.setAmount(0.0);
+            balanceRepository.save(toFromBalance);
+        }
 
         return mapToResponse(savedPayment);
     }
