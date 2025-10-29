@@ -26,4 +26,9 @@ public class Balance {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
+
+    // @Version
+    // @Column(name = "version")
+    // private Long version;
+
 }

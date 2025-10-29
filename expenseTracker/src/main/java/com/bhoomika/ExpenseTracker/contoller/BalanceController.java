@@ -1,4 +1,4 @@
-// BalanceController.java_v1
+// BalanceController.java_v2
 // REST API for fetching balance summaries in a group
 // Shows who owes whom and how much
 
@@ -40,5 +40,14 @@ public class BalanceController {
             @RequestParam Long to) {
         Double balance = balanceService.getBalanceBetween(groupId, from, to);
         return ResponseEntity.ok(balance);
+    }
+    /**
+     * GET simplified debts for a group to minimize transactions
+     * GET /api/balances/group/{groupId}/simplified
+     */
+    @GetMapping("/group/{groupId}/simplified")
+    public ResponseEntity<List<BalanceResponse>> getSimplifiedBalances(@PathVariable Long groupId) {
+        List<BalanceResponse> simplified = balanceService.simplifyDebts(groupId);
+        return ResponseEntity.ok(simplified);
     }
 }
